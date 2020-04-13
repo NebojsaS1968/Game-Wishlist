@@ -11,34 +11,50 @@ const sortGames = (a, b, value) => {
   } 
 
 const showAllGames = async (req, res, next) => {
-    if(req.query.sort === "price" && req.query.order === "asc"){
-      const game = await Game.find({});
+    if(req.query.sort === "price" && req.query.order === "asc" ){
+      if (req.query.limit){
+        const games = await Game.find({}).limit(parseInt(req.query.limit))
+        return res.status(200).send(games)
+     }
+      const game = await Game.find({})
       const games = game.sort((a, b) => sortGames(a, b, "price"));
-      res.status(200).send({ games });
+      res.status(200).send({ games })
     }
   
-    if(req.query.sort === "price" && req.query.order === "desc"){
-      const game = await Game.find({});
+    if(req.query.sort === "price" && req.query.order === "desc" ){
+      if (req.query.limit){
+        const games = await Game.find({}).limit(parseInt(req.query.limit))
+        return res.status(200).send(games)
+     }
+      const game = await Game.find({})
       const games = game.sort((a, b) => sortGames(a, b, "priec")).reverse()
-      res.status(200).send({ games });
+      res.status(200).send({ games })
+      
     }
   
-    if(req.query.sort === "discount" && req.query.order === "desc"){
-      const game = await Game.find({});
-      const games = game.sort((a, b) => sortGames(a, b, "discount"));
-      res.status(200).send({ games });
+    if(req.query.sort === "discount" && req.query.order === "desc" ){
+      if (req.query.limit){
+        const games = await Game.find({}).limit(parseInt(req.query.limit))
+        return res.status(200).send(games)
+     }
+      const game = await Game.find({})
+      const games = game.sort((a, b) => sortGames(a, b, "discount"))
+      res.status(200).send({ games })
+      
     }
   
-    if(req.query.sort === "discount" && req.query.order === "asc"){
-      const game = await Game.find({});
+    if(req.query.sort === "discount" && req.query.order === "asc" ){
+      if (req.query.limit){
+        const games = await Game.find({}).limit(parseInt(req.query.limit))
+        return res.status(200).send(games)
+     }
+      const game = await Game.find({})
       const games = game.sort((a, b) => sortGames(a, b, "discount")).reverse()
-      res.status(200).send({ games });
+      res.status(200).send({ games })
+      
     }
 
-    if (req.query.limit){
-      game = await Game.find({}).limit(parseInt(req.query.limit));
-      res.status(200).send(games);
-    }
+    
   
     if (!req.query.sort && !req.query.order) {
       const games = await Game.find({})
