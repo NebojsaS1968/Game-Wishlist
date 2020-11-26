@@ -17,16 +17,25 @@ const {
   addGame,
   deleteGame,
   updateGame,
-  searchGameTitle
+  searchGameTitle,
+  deleteAllGames
 } = Games;
 
-router.route("/").get(showAllGames).post(validation(addGameSchema), addGame)
-router
-  .route("/:id")
+// /api/v1/games
+router.route("/")
+  .get(showAllGames)
+  .post(validation(addGameSchema), addGame)
+  .delete(deleteAllGames)
+
+router.route("/:id")
   .get(getGameById)
   .delete(deleteGame)
   .patch(validation(updateGameSchema), updateGame)
-router.route("/:id/description").get(getGameDescription)
-router.get("/search/:title", searchGameTitle)
+
+router.route("/:id/desc")
+  .get(getGameDescription)
+
+router.route("/search/:title")
+  .get(searchGameTitle)
 
 module.exports = router;

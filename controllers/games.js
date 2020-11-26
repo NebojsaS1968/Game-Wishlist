@@ -1,67 +1,31 @@
 const Game = require("../models/game")
 
-const sortGames = (a, b, value) => {
-    if (a[value] < b[value]) {
-      return -1
-    }
-    if (a[value] > b[value]) {
-      return 1
-    }
-    return 0
+const showAllGames = async (req, res, next) => {
+  // limit
+  if(req.query.limit){
+    const games = await Game.find({}).limit(parseInt(req.query.limit))
+    return res.status(200).send(games)
   } 
 
-const showAllGames = async (req, res, next) => {
-    if(req.query.sort === "price" && req.query.order === "asc" ){
-      if (req.query.limit){
-        const games = await Game.find({}).limit(parseInt(req.query.limit))
-        return res.status(200).send(games)
-     }
-      const game = await Game.find({})
-      const games = game.sort((a, b) => sortGames(a, b, "price"));
-      res.status(200).send({ games })
-    }
-  
-    if(req.query.sort === "price" && req.query.order === "desc" ){
-      if (req.query.limit){
-        const games = await Game.find({}).limit(parseInt(req.query.limit))
-        return res.status(200).send(games)
-     }
-      const game = await Game.find({})
-      const games = game.sort((a, b) => sortGames(a, b, "priec")).reverse()
-      res.status(200).send({ games })
-      
-    }
-  
-    if(req.query.sort === "discount" && req.query.order === "desc" ){
-      if (req.query.limit){
-        const games = await Game.find({}).limit(parseInt(req.query.limit))
-        return res.status(200).send(games)
-     }
-      const game = await Game.find({})
-      const games = game.sort((a, b) => sortGames(a, b, "discount"))
-      res.status(200).send({ games })
-      
-    }
-  
-    if(req.query.sort === "discount" && req.query.order === "asc" ){
-      if (req.query.limit){
-        const games = await Game.find({}).limit(parseInt(req.query.limit))
-        return res.status(200).send(games)
-     }
-      const game = await Game.find({})
-      const games = game.sort((a, b) => sortGames(a, b, "discount")).reverse()
-      res.status(200).send({ games })
-      
-    }
-
-    
-  
-    if (!req.query.sort && !req.query.order) {
-      const games = await Game.find({})
-      res.status(200)
-      res.send({ games: games })
-    }
+  // query rating&price with asc&desc
+  if(req.query.sort === "rating" && req.query.order === "asc"){
+    const games = await Game.find({}).sort({ rating: 1 })
+    return res.status(200).send(games)
+  } else if(req.query.sort === "rating" && req.query.order === "desc"){
+    const games = await Game.find({}).sort({ rating: -1 })
+    return res.status(200).send(games)
+  } else if(req.query.sort === "price" && req.query.order === "asc"){
+    const games = await Game.find({}).sort({ price: 1 })
+    return res.status(200).send(games)
+  } else if(req.query.sort === "price" && req.query.order === "desc"){
+    const games = await Game.find({}).sort({ price: -1 })
+    return res.status(200).send(games)
   }
+
+  // no queries
+  const games = await Game.find({})
+  res.status(200).send({ games: games })
+}
 
   const getGameById = async (req, res, next) => {
     const { id } = req.params
@@ -69,12 +33,11 @@ const showAllGames = async (req, res, next) => {
     res.status(200).send({ game })
   }
   
-
   const searchGameTitle = async (req, res, next) => {
     const { title } = req.params;
     const game = await Game.find().where("title").equals(new RegExp(title, "i"));
     if (game.length === 0) {
-      res.status(200).send({ err: "An error has occured!" });
+      res.status(200).send({ err: "Error!" });
     } else {
       res.status(200).send({ game });
     }
@@ -88,19 +51,17 @@ const showAllGames = async (req, res, next) => {
   }
 
   const addGame = async (req, res, next) =>{
-        console.log(req.body)
-        const newGame = {
-          title:  req.body.title,
-          year: req.body.year,
-          price: req.body.price,
-          discount: req.body.discount,
-          rating: req.body.rating,
-          publisher: req.body.publisher,
-          description: req.body.description
-        }
-        const game = new Game(newGame)
-        const saveGame = await game.save()
-        res.status(201).json({ msg: "Game is saved", newGame: saveGame })
+     const newGame = {
+      title:  req.body.title,
+      year: req.body.year,
+      price: req.body.price,
+      rating: req.body.rating,
+      publisher: req.body.publisher,
+      description: req.body.description
+     }
+      const game = new Game(newGame)
+      const saveGame = await game.save()
+      res.status(201).json({ msg: "Game is saved", newGame: saveGame })
   }
 
   const deleteGame = async (req, res, next) => {
@@ -109,11 +70,18 @@ const showAllGames = async (req, res, next) => {
     res.status(200).send({ msg: "Game is deleted" })
   }
 
+  const deleteAllGames = async (req, res, next) => {
+    await Game.deleteMany();
+    res.status(200).send({ msg: "All games deleted!" })
+  }
+
   const updateGame = async (req, res, next) => {
     const { id } = req.params
     const update = req.body
-    await Game.findByIdAndUpdate(id, update)
-    res.status(200).send({ msg: "Game is updated" })
+    // problem: cant display updated game in json response, it shows the old version of the game(unupdated)
+    const game = await Game.findByIdAndUpdate(id, update)
+    const save = await game.save()
+    res.status(201).send({ msg: "Game is updated", updatedGame: save })
   }
 
   module.exports = { 
@@ -123,5 +91,6 @@ const showAllGames = async (req, res, next) => {
      deleteGame, 
      getGameById, 
      getGameDescription, 
-     searchGameTitle
+     searchGameTitle,
+     deleteAllGames
    }
