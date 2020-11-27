@@ -23,12 +23,20 @@ const {
 } = RegisterC
 const {
   getAllUsers,
-  deleteAllUsers
+  deleteAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser
 } = UserC
 
 router.route('/')
 .get(checkSessProtect, getAllUsers)
-.delete(deleteAllUsers)
+.delete(checkSessProtect, deleteAllUsers)
+
+router.route('/:id')
+.get(getUserById)
+.delete(deleteUser)
+.patch(validation(updateUserSchema), updateUser)
 
 router.post('/login', checkSessLoged, login)
 router.post('/register', validation(addUserSchema), registerValid, register)

@@ -37,6 +37,9 @@ mongoose
   .then(() => console.log("Connected to database..."))
   .catch((err) => console.log(err))
 
+// Deprication error
+mongoose.set('useFindAndModify', false)
+
 // Routes
 const games = require('./routes/games')
 const user = require('./routes/user')
