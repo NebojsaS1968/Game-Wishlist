@@ -7,7 +7,11 @@ const game = new Schema({
   year: Number,
   rating: Number,
   publisher: String,
-  description: String
+  description: String,
+  users: [{
+    type: Schema.Types.ObjectId,
+    ref: "user"
+  }]
 });
 
 const Game = mongoose.model("game", game);

@@ -43,9 +43,15 @@ mongoose.set('useFindAndModify', false)
 // Routes
 const games = require('./routes/games')
 const user = require('./routes/user')
+const register = require('./routes/register')
+const login = require('./routes/login')
+const logout = require('./routes/logout')
 
 app.use('/games', games)
 app.use('/user', user)
+app.use('/register', register)
+app.use('/login', login)
+app.use('/logout', logout)
 
 
 app.listen(port, () => console.log('Server is listening on port 3000'))

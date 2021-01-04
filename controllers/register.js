@@ -12,7 +12,7 @@ const register = async (req, res, next) => {
         if(user){
             // User exists
             return res.status(200).send({ msg: "User already exists." })
-        } else {
+        } else if(!user){
             // User doesn't exist
             const user = new User(newUser)
             user.password = await bcrypt.hash(req.body.password, salt)

@@ -1,4 +1,5 @@
 const User = require('../models/user')
+const Game = require('../models/game')
 
 // Get all
 const getAllUsers = async (req, res, next) => {
@@ -15,7 +16,7 @@ const deleteAllUsers = async (req, res, next) => {
 // Get by id
 const getUserById = async (req, res, next) => {
     const { id } = req.params
-    const user = await User.findById(id)
+    const user = await User.findById(id).populate("wishlist")
     res.status(200).send({ user: user })
 }
 
@@ -41,10 +42,33 @@ const deleteUser = async (req, res, next) => {
     res.status(200).send({ msg: `User ${user.name} deleted.` })
 }
 
+// Add game to wishlist
+const addToWishlist = async (req, res, next) => {
+    const { id } = req.params
+    const { gameId } = req.body
+
+    const user = await User.findById(id)
+    const game = await Game.findById(gameId)
+
+    if(user.wishlist.includes(gameId) || game.users.includes(id)){
+        return res.status(200).send({ msg: "User already has that game in his wishlist." })
+    } else {
+        user.wishlist.push(gameId)
+        const save = await user.save()
+
+        game.users.push(id)
+        await game.save()
+
+        return res.status(201).send(save)
+    }
+
+}
+
 module.exports = {
     getAllUsers,
     deleteAllUsers,
     deleteUser,
     updateUser,
-    getUserById
+    getUserById,
+    addToWishlist
 }

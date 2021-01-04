@@ -4,7 +4,11 @@ const Schema = mongoose.Schema;
 const user = new Schema({
   name: String,
   email: String,
-  password: String
+  password: String,
+  wishlist: [{
+    type: Schema.Types.ObjectId,
+    ref: "game"
+  }]
 });
 
 const User = mongoose.model("user", user);
