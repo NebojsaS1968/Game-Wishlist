@@ -18,7 +18,8 @@ const {
   deleteGame,
   updateGame,
   searchGameTitle,
-  deleteAllGames
+  deleteAllGames,
+  getGameTitles
 } = Games;
 
 // /api/v1/games
@@ -26,6 +27,9 @@ router.route("/")
   .get(showAllGames)
   .post(validation(addGameSchema), addGame)
   .delete(deleteAllGames)
+
+router.route("/getGameTitles")
+  .get(getGameTitles)
 
 router.route("/:id")
   .get(getGameById)

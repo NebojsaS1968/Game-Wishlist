@@ -84,6 +84,13 @@ const showAllGames = async (req, res, next) => {
     res.status(201).send({ msg: "Game is updated", updatedGame: save })
   }
 
+  const getGameTitles = async (req, res, next) => {
+    const games = await Game.find({})
+    games.forEach(game => {
+      res.status(200).send({titles : game.title})
+    })
+  }
+
   module.exports = { 
      showAllGames,
      addGame, 
@@ -92,5 +99,6 @@ const showAllGames = async (req, res, next) => {
      getGameById, 
      getGameDescription, 
      searchGameTitle,
-     deleteAllGames
+     deleteAllGames,
+     getGameTitles
    }
